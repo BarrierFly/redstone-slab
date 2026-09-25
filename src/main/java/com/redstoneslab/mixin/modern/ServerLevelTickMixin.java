@@ -25,29 +25,47 @@ import com.redstoneslab.util.HalfDelay;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Doubles the ice / snow probability above a top redstone slab.
+ *
+ * <p>Vanilla decides the 1-in-48 chance <em>before</em> the random position is sampled, so the
+ * threshold cannot be chosen from the position without restructuring the method. To stay
+ * compatible with MixinExtras-based mods (which hook {@code @Redirect}), this runs an additional
+ * 1-in-48 precipitation pass restricted to qualifying positions. The combined probability for a
+ * qualifying position is therefore approximately 2-in-48 = 1-in-24.
+ */
 @Mixin(ServerLevel.class)
 public class ServerLevelTickMixin
 {
-	@Redirect(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
-	private int redstoneslab$alwaysSample(RandomSource random, int bound)
+	@Inject(method = "tickChunk", at = @At("HEAD"))
+	private void redstoneslab$extraPrecipitation(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci)
 	{
-		return 0;
-	}
-
-	@Redirect(method = "tickChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;tickPrecipitation(Lnet/minecraft/core/BlockPos;)V"))
-	private void redstoneslab$thresholdPrecipitation(ServerLevel level, BlockPos pos)
-	{
-		BlockPos topPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos);
-		boolean qualified = HalfDelay.isTopSlabBelow(level, topPos.below()) || HalfDelay.isTopSlabBelow(level, topPos);
-		int threshold = qualified ? 24 : 48;
-		if (level.getRandom().nextInt(threshold) == 0)
+		if (randomTickSpeed <= 0)
 		{
-			level.tickPrecipitation(pos);
+			return;
+		}
+		ServerLevel level = (ServerLevel) (Object) this;
+		RandomSource random = level.getRandom();
+		ChunkPos chunkPos = chunk.getPos();
+		int x = chunkPos.getMinBlockX();
+		int z = chunkPos.getMinBlockZ();
+		for (int k = 0; k < randomTickSpeed; k++)
+		{
+			BlockPos candidate = level.getBlockRandomPos(x, 0, z, 15);
+			BlockPos topPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, candidate);
+			boolean qualified = HalfDelay.isTopSlabBelow(level, topPos.below()) || HalfDelay.isTopSlabBelow(level, topPos);
+			if (qualified && random.nextInt(48) == 0)
+			{
+				level.tickPrecipitation(candidate);
+			}
 		}
 	}
 }
