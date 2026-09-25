@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.redstoneslab.mixin",
+  "compatibilityLevel": "{{COMPATIBILITY_LEVEL}}",
+  "mixins": [
+    "FallingBlockEntityAccessor",
+    "BlockInvoker",
+    "PistonMovingBlockEntityMixin",
+    "modern.ModernScheduleTickMixin",
+    "legacy.LegacyScheduleTickMixin",
+    "modern.ServerLevelTickMixin",
+    "modern.ComparatorBlockMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

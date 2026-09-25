@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "redstoneslab:block/redstone_slab"
+    },
+    "type=top": {
+      "model": "redstoneslab:block/redstone_slab_top"
+    },
+    "type=double": {
+      "model": "redstoneslab:block/redstone_slab_double"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+block:
+  redstoneslab:
+    redstone_slab: Redstone Slab
+entity:
+  redstoneslab:
+    falling_redstone_slab: Redstone Slab

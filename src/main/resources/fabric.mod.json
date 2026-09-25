@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+
+  "name": "${name}",
+  "description": "A directional redstone slab with half-delay, gravity and comparator 7.5 semantics.",
+  "authors": [
+    "GTC"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com",
+    "sources": "https://github.com/GTC/redstone-slab"
+  },
+  "license": "LGPL-3.0",
+
+  "icon": "icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.redstoneslab.RedstoneSlabMod"
+    ],
+    "client": [
+      "com.redstoneslab.client.RedstoneSlabModClient"
+    ]
+  },
+  "mixins": [
+    "redstoneslab.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.0",
+    "minecraft": "${minecraft_dependency}",
+    "fabric-api": "*"
+  }
+}

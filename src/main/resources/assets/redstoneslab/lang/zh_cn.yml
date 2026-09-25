@@ -1,0 +1,6 @@
+block:
+  redstoneslab:
+    redstone_slab: 红石台阶
+entity:
+  redstoneslab:
+    falling_redstone_slab: 红石台阶
