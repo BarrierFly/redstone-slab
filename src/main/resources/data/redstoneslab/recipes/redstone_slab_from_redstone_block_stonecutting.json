@@ -1,8 +1,6 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:redstone_block"
-  },
+  "ingredient": __RS_RECIPE_INGREDIENT__,
   "result": "redstoneslab:redstone_slab",
   "count": 2
 }

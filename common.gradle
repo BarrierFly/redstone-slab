@@ -125,6 +125,15 @@ processResources {
 	filesMatching(MIXIN_CONFIG_PATH) {
 		filter { s -> s.replace('{{COMPATIBILITY_LEVEL}}', "JAVA_${MIXIN_COMPATIBILITY_LEVEL.ordinal() + 1}") }
 	}
+
+	// Recipe ingredient syntax differs: 1.21.10+ accepts a plain item id, older versions require {"item": ...}
+	def recipeIngredient = mcVersion >= 12110 ? '"minecraft:redstone_block"' : '{"item":"minecraft:redstone_block"}'
+	filesMatching('**/recipe/*.json') {
+		filter { line -> line.replace('__RS_RECIPE_INGREDIENT__', recipeIngredient) }
+	}
+	filesMatching('**/recipes/*.json') {
+		filter { line -> line.replace('__RS_RECIPE_INGREDIENT__', recipeIngredient) }
+	}
 }
 
 // https://github.com/Fallen-Breath/yamlang

@@ -41,12 +41,15 @@ Supported versions / 支持版本:
 - **Crafting / 合成**: 3 redstone blocks → 6 slabs; stonecutter 1 redstone block → 2 slabs.
 - Drops: single slab → 1, double slab → 2.
 
-> **Warning / 警告**: the ice/snow doubling is implemented by adding an extra precipitation pass,
-> which changes the world RNG sequence. Some vanilla randomness (random ticks etc.) may differ from
-> the same seed without this mod. This is the accepted trade-off described in the design plan.
+> **Warning / 警告**: the ice/snow doubling is implemented by sampling the random block position first
+> and then using threshold `24` instead of `48` for qualifying positions (vanilla samples the
+> position after the threshold). This reordering changes the world RNG sequence, so some vanilla
+> randomness (random ticks etc.) may differ from the same seed without this mod. This is the accepted
+> trade-off described in the design plan.
 >
-> 冰/雪翻倍通过追加一次降水判定实现，会改变世界随机数序列；同种子下部分原版随机行为
-> （随机刻等）可能与本模组无关的原版不同。这是设计文档中已接受的风险。
+> 冰/雪翻倍通过先抽取随机位置、对满足条件的位置将门限由 `48` 改为 `24` 实现（原版先判定门限、后抽取
+> 位置）。该重排会改变世界随机数序列；同种子下部分原版随机行为（随机刻等）可能与无本模组的原版不同。
+> 这是设计文档中已接受的风险。
 
 ## Differences from the existing "Redstone Slab" / 与既有 "Redstone Slab" 的区别
 
