@@ -39,7 +39,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -96,7 +95,7 @@ public class RedstoneSlabMod implements ModInitializer
 						.requiresCorrectToolForDrops()
 						.strength(5.0F, 6.0F)
 						.sound(SoundType.METAL)
-						.isRedstoneConductor(Blocks::never)
+						.isRedstoneConductor((state, level, pos) -> false)
 						//#if MC >= 260000
 						//$$ .pushReaction(PushReaction.PUSH_PULL);
 						//#elseif MC >= 12000
