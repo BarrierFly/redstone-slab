@@ -18,28 +18,35 @@
  * along with Redstone Slab.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.redstoneslab.mixin;
+package com.redstoneslab.mixin.legacy;
 
-import com.redstoneslab.util.DownwardSupport;
-import com.redstoneslab.util.HalfDelay;
+import com.redstoneslab.util.WireReadGuard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.piston.PistonMovingBlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PistonMovingBlockEntity.class)
-public class PistonMovingBlockEntityMixin
+//#if MC < 12102
+//$$ @Mixin(net.minecraft.world.level.block.RedStoneWireBlock.class)
+//$$ public abstract class LegacyRedstoneWireBlockMixin
+//$$ {
+//$$ 	@Inject(method = "calculateTargetStrength", at = @At("HEAD"))
+//$$ 	private void redstoneslab$enterWireRead(Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir)
+//$$ 	{
+//$$ 		WireReadGuard.push();
+//$$ 	}
+//$$
+//$$ 	@Inject(method = "calculateTargetStrength", at = @At("RETURN"))
+//$$ 	private void redstoneslab$exitWireRead(Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir)
+//$$ 	{
+//$$ 		WireReadGuard.pop();
+//$$ 	}
+//$$ }
+//#else
+@Mixin(net.minecraft.world.level.block.Block.class)
+public abstract class LegacyRedstoneWireBlockMixin
 {
-	@ModifyVariable(method = "tick", at = @At(value = "STORE"), ordinal = 0)
-	private static float redstoneslab$fasterProgress(float value, Level level, BlockPos pos, BlockState state, PistonMovingBlockEntity blockEntity)
-	{
-		if (HalfDelay.isTopSlabBelow(level, pos) && DownwardSupport.requiresDownwardSupport(blockEntity.getMovedState()))
-		{
-			return value + 0.5F;
-		}
-		return value;
-	}
 }
+//#endif

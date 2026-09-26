@@ -10,7 +10,9 @@
     "modern.ModernScheduleTickMixin",
     "legacy.LegacyScheduleTickMixin",
     "modern.ServerLevelTickMixin",
-    "modern.ComparatorBlockMixin"
+    "modern.ComparatorBlockMixin",
+    "modern.RedstoneWireBlockMixin",
+    "legacy.LegacyRedstoneWireBlockMixin"
   ],
   "client": [
   ],

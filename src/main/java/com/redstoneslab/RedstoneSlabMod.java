@@ -111,7 +111,7 @@ public class RedstoneSlabMod implements ModInitializer
 		return new BlockItem(
 				REDSTONE_SLAB,
 				//#if MC >= 12110
-				new Item.Properties().setId(ModIds.item("redstone_slab"))
+				new Item.Properties().setId(ModIds.item("redstone_slab")).useBlockDescriptionPrefix()
 				//#else
 				//$$ new Item.Properties()
 				//#endif
@@ -124,8 +124,12 @@ public class RedstoneSlabMod implements ModInitializer
 		//#if MC >= 260000
 		//$$ CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS)
 		//$$ 		.register(output -> output.accept(new ItemStack(REDSTONE_SLAB_ITEM)));
+		//$$ CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS)
+		//$$ 		.register(output -> output.accept(new ItemStack(REDSTONE_SLAB_ITEM)));
 		//#else
 		ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS)
+				.register(entries -> entries.accept(new ItemStack(REDSTONE_SLAB_ITEM)));
+		ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS)
 				.register(entries -> entries.accept(new ItemStack(REDSTONE_SLAB_ITEM)));
 		//#endif
 	}

@@ -21,6 +21,7 @@
 package com.redstoneslab.block;
 
 import com.redstoneslab.entity.RedstoneSlabFallingEntity;
+import com.redstoneslab.util.WireReadGuard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -76,7 +77,11 @@ public class RedstoneSlabBlock extends SlabBlock
 	@Override
 	public int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction)
 	{
-		return 0;
+		if (WireReadGuard.isReadingWireInput())
+		{
+			return 0;
+		}
+		return this.getSignal(state, level, pos, direction);
 	}
 
 	@Override

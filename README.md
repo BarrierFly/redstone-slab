@@ -19,10 +19,13 @@ Supported versions / 支持版本:
 
 ## Features / 功能
 
-- **Directional weak signal / 方向性弱充能**
+- **Directional signal / 方向性信号**
   - `top` slab powers **15 upward**, `bottom` slab powers **15 downward**, horizontal always **7**.
   - `double` slab powers **15** in every direction.
-  - All are weak power only (strong power is `0`); the double slab is a non-conductor.
+  - The slab also emits direct (strong) power in those directions, so an adjacent redstone conductor is
+    charged and can activate non-wire components (pistons, lamps, doors, repeaters, ...). A conductor
+    charged by the slab does **not** power redstone wire; redstone wire that is directly adjacent to the
+    slab is still powered by the slab's weak signal. The double slab is a non-conductor.
 - **Redstone wire connection / 红石线连接**: driven by `isSignalSource`, so wires connect on all versions.
 - **Half delay / 计划刻减半**: when the block directly below is a `top` redstone slab,
   - repeater `2/4/6/8 → 1/2/3/4`, comparator `2 → 1`, torch `2 → 1`, torch burnout `160 → 80`,
@@ -32,9 +35,11 @@ Supported versions / 支持版本:
   - water `5 → 2|3`, lava `30 → 15`.
 - **Ice / snow doubling / 区块刻概率翻倍**: water above a `top` slab freezes, and snow above a `top`
   slab accumulates, at (approximately) double the vanilla rate.
-- **Moving piston / 移塞**: a `moving_piston` above a `top` slab advances progress by `1` per tick.
-- **Gravity / 重力**: a `top` slab falls as a custom falling entity. Falling into a `bottom` redstone
-  slab merges it into a `double` slab; otherwise it solidifies as a `bottom` slab.
+- **Moving piston / 移塞**: a `moving_piston` above a `top` slab whose contained block needs downward
+  support advances progress by `1` per tick.
+- **Gravity / 重力**: a `top` slab falls as a custom falling entity whose collision box is the upper
+  8px. Falling into a `bottom` redstone slab merges it into a `double` slab, unless a living entity
+  blocks it at the 10px plane; otherwise it solidifies as a `bottom` slab.
 - **Comparator 7.5 / 比较器 7.5**: a slab as the front input reads `7`; as a side input it reads `8`.
   When both the front and a side are slabs, COMPARE outputs `7` and SUBTRACT outputs `0`.
 - **Waterlogging / 含水**: slabs may be waterlogged; water is cleared when a falling slab lands/merges.
@@ -51,8 +56,9 @@ Supported versions / 支持版本:
 
 ## Differences from the existing "Redstone Slab" / 与既有 "Redstone Slab" 的区别
 
-There is an unrelated closed-source NeoForge 1.21.1 mod named *Redstone Slab* that is essentially a
-redstone block shaped like a slab. This project differs:
+There is an unrelated closed-source NeoForge mod named
+[Redstone Slab](https://modrinth.com/mod/redstone-slab) (by iMacJack) that is essentially a redstone
+block shaped like a slab. This project differs:
 
 1. Directional signal (`top` 15 up / 7 side, `bottom` 15 down / 7 side, `double` 15 everywhere) instead of all-direction 15.
 2. Comparator `7.5` semantics.
@@ -77,12 +83,24 @@ Output jars are in `versions/<version>/build/libs/` (and gathered into `build/li
 
 Requires Fabric Loader and Fabric API. Drop the jar for your Minecraft version into `mods/`.
 
-## Acknowledgements / 致谢
+## Credits / 致谢
 
-- Build skeleton based on [fabric-mod-template](https://github.com/Fallen-Breath/fabric-mod-template)
-  (ReplayMod preprocessor, LGPL-3.0).
-- Design and compatibility notes reference `fabric-carpet`, `Carpet-TIS-Addition`, `SubTick`,
-  `ticker`, `microtimingreplay` and `guardian` (read-only).
+- Design inspired by [this video](https://www.bilibili.com/video/BV1ogkcYVEiN/) (a redstone slab that
+  emits `7.5` redstone power and halves the delay of the components attached to it).
+- Build skeleton based on [fabric-mod-template](https://github.com/Fallen-Breath/fabric-mod-template),
+  using the [ReplayMod preprocessor](https://github.com/ReplayMod/preprocessor) /
+  [Fallen-Breath preprocessor](https://github.com/Fallen-Breath/preprocessor) and
+  [yamlang](https://github.com/Fallen-Breath/yamlang).
+- Design and compatibility notes reference these projects (read-only):
+  - [fabric-carpet](https://github.com/gnembon/fabric-carpet) and
+    [Carpet-TIS-Addition](https://github.com/TISUnion/Carpet-TIS-Addition)
+  - [SubTick](https://github.com/lntricate1/SubTick)
+  - [ticker](https://github.com/hotpad100c/ticker)
+  - [microtimingreplay](https://github.com/hotpad100c/microtimingreplay)
+  - [ModMenu](https://github.com/TerraformersMC/ModMenu)
+- Built with [Fabric Loader](https://github.com/FabricMC/fabric-loader),
+  [Fabric API](https://github.com/FabricMC/fabric) and
+  [Fabric Loom](https://github.com/FabricMC/fabric-loom).
 
 ## License
 

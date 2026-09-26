@@ -56,7 +56,7 @@ public interface ModernScheduleTickMixin
 			ci.cancel();
 			return;
 		}
-		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1)
+		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1 || !HalfDelay.isDownwardAttached(level.getBlockState(pos)))
 		{
 			return;
 		}
@@ -82,7 +82,7 @@ public interface ModernScheduleTickMixin
 			ci.cancel();
 			return;
 		}
-		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1)
+		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1 || !HalfDelay.isDownwardAttached(level.getBlockState(pos)))
 		{
 			return;
 		}

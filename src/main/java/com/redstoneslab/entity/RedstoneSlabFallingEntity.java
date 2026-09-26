@@ -46,6 +46,27 @@ public class RedstoneSlabFallingEntity extends FallingBlockEntity
 		super(entityType, level);
 	}
 
+	//#if MC >= 12110
+	@Override
+	protected AABB makeBoundingBox(Vec3 position)
+	{
+		return this.redstoneslab$slabBox(position);
+	}
+	//#else
+	//$$ @Override
+	//$$ protected AABB makeBoundingBox()
+	//$$ {
+	//$$ 	return this.redstoneslab$slabBox(this.position());
+	//$$ }
+	//#endif
+
+	private AABB redstoneslab$slabBox(Vec3 position)
+	{
+		return new AABB(
+				position.x - 0.49, position.y + 0.5, position.z - 0.49,
+				position.x + 0.49, position.y + 1.0, position.z + 0.49);
+	}
+
 	public static RedstoneSlabFallingEntity fall(Level level, BlockPos pos, BlockState state)
 	{
 		RedstoneSlabFallingEntity entity = new RedstoneSlabFallingEntity(RedstoneSlabMod.FALLING_REDSTONE_SLAB, level);
@@ -79,23 +100,27 @@ public class RedstoneSlabFallingEntity extends FallingBlockEntity
 		//#endif
 		this.move(MoverType.SELF, this.getDeltaMovement());
 
-		if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel)
-		{
-			this.serverTick(serverLevel);
-		}
+		this.tickLogic();
 
 		this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
 	}
 
-	private void serverTick(ServerLevel level)
+	private BlockPos slabPos()
 	{
-		BlockPos pos = this.blockPosition();
+		return BlockPos.containing(this.getX(), this.getY() + 0.5, this.getZ());
+	}
+
+	private void tickLogic()
+	{
+		Level level = this.level();
+		ServerLevel serverLevel = level instanceof ServerLevel && !level.isClientSide() ? (ServerLevel) level : null;
+		BlockPos pos = this.slabPos();
 		BlockState current = level.getBlockState(pos);
 
 		if (current.getBlock() instanceof RedstoneSlabBlock && current.getValue(RedstoneSlabBlock.TYPE) == SlabType.BOTTOM)
 		{
 			double planeY = pos.getY() + 0.625;
-			if (this.getY() <= planeY && this.getDeltaMovement().y <= 0.0)
+			if (this.getY() + 0.5 <= planeY && this.getDeltaMovement().y <= 0.0)
 			{
 				LivingEntity blocker = this.findBlocker(level, pos);
 				if (blocker != null)
@@ -103,40 +128,63 @@ public class RedstoneSlabFallingEntity extends FallingBlockEntity
 					this.setPos(this.getX(), planeY - 0.5, this.getZ());
 					this.setDeltaMovement(Vec3.ZERO);
 					this.time = 0;
-					this.hurtAndReset(level, pos, blocker);
+					if (serverLevel != null)
+					{
+						this.hurtAndReset(serverLevel, pos, blocker);
+					}
 				}
-				else
+				else if (serverLevel != null)
 				{
-					level.setBlock(pos, current.setValue(RedstoneSlabBlock.TYPE, SlabType.DOUBLE).setValue(RedstoneSlabBlock.WATERLOGGED, false), 3);
+					serverLevel.setBlock(pos, current.setValue(RedstoneSlabBlock.TYPE, SlabType.DOUBLE).setValue(RedstoneSlabBlock.WATERLOGGED, false), 3);
 					this.discard();
 				}
 			}
 			return;
 		}
 
-		if (this.onGround() || current.isAir())
+		if (this.onGround())
 		{
-			if (current.isAir())
+			if (serverLevel != null)
 			{
-				level.setBlock(pos, this.getBlockState().setValue(RedstoneSlabBlock.TYPE, SlabType.BOTTOM).setValue(RedstoneSlabBlock.WATERLOGGED, false), 3);
-				this.discard();
-				return;
+				this.solidify(serverLevel, pos);
 			}
+			return;
 		}
 
-		if (this.time > MAX_TIME
-				//#if MC >= 12110
-				|| this.getY() < level.getMinY() - 64
-				//#else
-				//$$ || this.getY() < level.getMinBuildHeight() - 64
-				//#endif
-		)
+		if (this.time > MAX_TIME || this.belowWorld(level))
 		{
 			this.discard();
 		}
 	}
 
-	private LivingEntity findBlocker(ServerLevel level, BlockPos pos)
+	private boolean belowWorld(Level level)
+	{
+		//#if MC >= 12110
+		return this.getY() < level.getMinY() - 64;
+		//#else
+		//$$ return this.getY() < level.getMinBuildHeight() - 64;
+		//#endif
+	}
+
+	private void solidify(ServerLevel level, BlockPos pos)
+	{
+		if (level.getBlockState(pos).canBeReplaced())
+		{
+			level.setBlock(pos, this.getBlockState().setValue(RedstoneSlabBlock.TYPE, SlabType.BOTTOM).setValue(RedstoneSlabBlock.WATERLOGGED, false), 3);
+			this.discard();
+		}
+		else
+		{
+			this.discard();
+			//#if MC >= 12110
+			this.spawnAtLocation(level, this.getBlockState().getBlock());
+			//#else
+			//$$ this.spawnAtLocation(this.getBlockState().getBlock());
+			//#endif
+		}
+	}
+
+	private LivingEntity findBlocker(Level level, BlockPos pos)
 	{
 		List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, new AABB(pos));
 		for (LivingEntity entity : entities)

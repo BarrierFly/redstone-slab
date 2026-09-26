@@ -24,7 +24,12 @@ import com.redstoneslab.block.RedstoneSlabBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseCoralWallFanBlock;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
+import net.minecraft.world.level.block.RedstoneWallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.SlabType;
 
 public final class HalfDelay
@@ -37,6 +42,23 @@ public final class HalfDelay
 	{
 		BlockState below = level.getBlockState(pos.below());
 		return below.getBlock() instanceof RedstoneSlabBlock && below.getValue(RedstoneSlabBlock.TYPE) == SlabType.TOP;
+	}
+
+	public static boolean isDownwardAttached(BlockState state)
+	{
+		if (state.getBlock() instanceof RedstoneWallTorchBlock)
+		{
+			return false;
+		}
+		if (state.getBlock() instanceof ButtonBlock)
+		{
+			return state.getValue(FaceAttachedHorizontalDirectionalBlock.FACE) == AttachFace.FLOOR;
+		}
+		if (state.getBlock() instanceof BaseCoralWallFanBlock)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	public static int halve(int delay, RandomSource random)

@@ -61,10 +61,10 @@ package com.redstoneslab.mixin.legacy;
 //$$ 			ci.cancel();
 //$$ 			return;
 //$$ 		}
-//$$ 		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1)
-//$$ 		{
-//$$ 			return;
-//$$ 		}
+//$ 		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1 || !HalfDelay.isDownwardAttached(level.getBlockState(pos)))
+//$ 		{
+//$ 			return;
+//$ 		}
 //$$ 		int adjusted = HalfDelay.halve(delay, level.getRandom());
 //$$ 		if (adjusted != delay)
 //$$ 		{
@@ -99,10 +99,10 @@ package com.redstoneslab.mixin.legacy;
 //$$ 			ci.cancel();
 //$$ 			return;
 //$$ 		}
-//$$ 		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1)
-//$$ 		{
-//$$ 			return;
-//$$ 		}
+//$ 		if (!DelayPolicy.isHalfDelayBlock(block) || delay <= 1 || !HalfDelay.isDownwardAttached(level.getBlockState(pos)))
+//$ 		{
+//$ 			return;
+//$ 		}
 //$$ 		int adjusted = HalfDelay.halve(delay, level.getRandom());
 //$$ 		if (adjusted != delay)
 //$$ 		{
