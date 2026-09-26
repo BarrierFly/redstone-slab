@@ -40,19 +40,31 @@ Supported versions / 支持版本:
 - **Gravity / 重力**: a `top` slab falls as a custom falling entity whose collision box is the upper
   8px. Falling into a `bottom` redstone slab merges it into a `double` slab, unless a living entity
   blocks it at the 10px plane; otherwise it solidifies as a `bottom` slab.
-- **Comparator 7.5 / 比较器 7.5**: a slab as the front input reads `7`; as a side input it reads `8`.
-  When both the front and a side are slabs, COMPARE outputs `7` and SUBTRACT outputs `0`.
+- **Comparator 7.5 / 比较器 7.5**: a single slab as the front input reads `7`; as a side input it reads `8`.
+  Each input may combine several sources: if any source reaches `8` or more, the normal integer comparison
+  is used; otherwise a 7.5 source is treated as the strongest. When the front and a side both read 7.5
+  (and the other side is absent, also a slab, or below 8), COMPARE outputs `7` and SUBTRACT outputs `0`.
+  The front also counts as 7.5 when it is a redstone conductor charged by a single slab's horizontal side
+  charge (7) with nothing reaching 8; a container / item frame read through the front takes precedence.
+  Double slabs are never 7.5.
+  - 单个红石台阶作正面输入按 `7`、作侧面输入按 `8`。比较器的两侧输入与正面（经充能方块）都可汇总多个
+    来源：只要有任一来源 ≥8 就按正常整数比较，否则 7.5 来源作为最强信号参与特判。正面与某一侧同为 7.5
+    （且另一侧无输入、也是单层台阶或为 <8 的其他输入）时，比较模式输出 `7`、减法模式输出 `0`。正面为
+    「被单层台阶水平侧面充能且无 ≥8 来源」的导体时同样按 7.5 处理；经正面读到容器/展示框容量时以容量为准。
+    双半砖不参与 7.5。
 - **Waterlogging / 含水**: slabs may be waterlogged; water is cleared when a falling slab lands/merges.
 - **Crafting / 合成**: 3 redstone blocks → 6 slabs; stonecutter 1 redstone block → 2 slabs.
 - Drops: single slab → 1, double slab → 2.
 
-> **Warning / 警告**: the ice/snow doubling is implemented by adding an extra 1-in-48 precipitation
-> pass restricted to qualifying positions, so the effective probability is about 1-in-24. This
-> consumes extra world RNG, so some vanilla randomness (random ticks etc.) may differ from the same
-> seed without this mod. This is the accepted trade-off described in the design plan.
+> **Warning / 警告**: the ice/snow doubling is implemented by adding an extra precipitation roll
+> restricted to qualifying positions (1-in-48 on 1.21.1+, 1-in-16 on 1.19.4), so the effective
+> probability is about double vanilla. This consumes extra world RNG, so some vanilla randomness
+> (random ticks etc.) may differ from the same seed without this mod. This is the accepted trade-off
+> described in the design plan.
 >
-> 冰/雪翻倍通过为满足条件的位置追加一次 1/48 的降水判定实现，等效概率约 1/24。该实现会额外消耗世界
-> 随机数；同种子下部分原版随机行为（随机刻等）可能与无本模组的原版不同。这是设计文档中已接受的风险。
+> 冰/雪翻倍通过为满足条件的位置追加一次降水判定实现（1.21.1+ 为 1/48，1.19.4 为 1/16），等效概率约为原版
+> 两倍。该实现会额外消耗世界随机数；同种子下部分原版随机行为（随机刻等）可能与无本模组的原版不同。这是
+> 设计文档中已接受的风险。
 
 ## Compatibility / 兼容性
 
@@ -92,7 +104,12 @@ Output jars are in `versions/<version>/build/libs/` (and gathered into `build/li
 
 ## Install / 安装
 
-Requires Fabric Loader and Fabric API. Drop the jar for your Minecraft version into `mods/`.
+Requires Fabric Loader **0.15.0+** and Fabric API. Drop the jar for your Minecraft version into `mods/`.
+MixinExtras is used for the redstone-wire weak-charging guard and is provided by Fabric Loader (bundled
+since 0.15.0), so no extra dependency is needed.
+
+需要 Fabric Loader **0.15.0+** 与 Fabric API。把对应 Minecraft 版本的 jar 放进 `mods/` 即可。红石线弱充能
+护栏使用 MixinExtras，它自 Fabric Loader 0.15.0 起随 Loader 提供，无需额外依赖。
 
 ## Credits / 致谢
 
