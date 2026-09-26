@@ -21,43 +21,46 @@
 package com.redstoneslab.mixin.modern;
 
 import com.redstoneslab.util.WireReadGuard;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //#if MC >= 260000
 //$$ @Mixin(net.minecraft.world.level.block.RedstoneWireBlock.class)
 //$$ public abstract class RedstoneWireBlockMixin
 //$$ {
-//$$ 	@Inject(method = "getBlockSignal", at = @At("HEAD"))
-//$$ 	private void redstoneslab$enterWireRead(Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir)
+//$$ 	@WrapMethod(method = "getBlockSignal")
+//$$ 	private int redstoneslab$guardWireRead(Level level, BlockPos pos, Operation<Integer> original)
 //$$ 	{
 //$$ 		WireReadGuard.push();
-//$$ 	}
-//$$
-//$$ 	@Inject(method = "getBlockSignal", at = @At("RETURN"))
-//$$ 	private void redstoneslab$exitWireRead(Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir)
-//$$ 	{
-//$$ 		WireReadGuard.pop();
+//$$ 		try
+//$$ 		{
+//$$ 			return original.call(level, pos);
+//$$ 		}
+//$$ 		finally
+//$$ 		{
+//$$ 			WireReadGuard.pop();
+//$$ 		}
 //$$ 	}
 //$$ }
 //#elseif MC >= 12102
 @Mixin(net.minecraft.world.level.block.RedStoneWireBlock.class)
 public abstract class RedstoneWireBlockMixin
 {
-	@Inject(method = "getBlockSignal", at = @At("HEAD"))
-	private void redstoneslab$enterWireRead(Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir)
+	@WrapMethod(method = "getBlockSignal")
+	private int redstoneslab$guardWireRead(Level level, BlockPos pos, Operation<Integer> original)
 	{
 		WireReadGuard.push();
-	}
-
-	@Inject(method = "getBlockSignal", at = @At("RETURN"))
-	private void redstoneslab$exitWireRead(Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir)
-	{
-		WireReadGuard.pop();
+		try
+		{
+			return original.call(level, pos);
+		}
+		finally
+		{
+			WireReadGuard.pop();
+		}
 	}
 }
 //#else

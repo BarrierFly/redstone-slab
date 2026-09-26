@@ -18,57 +18,38 @@
  * along with Redstone Slab.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.redstoneslab.mixin.modern;
+package com.redstoneslab.mixin;
 
-//#if MC >= 12110
 import com.redstoneslab.block.RedstoneSlabBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.ComparatorBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ComparatorMode;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Comparator "7.5" special case: when both the front and a side of the comparator are single
+ * redstone slabs, COMPARE mode outputs 7 and the comparator turns on, instead of the vanilla
+ * result 0 (front 7, side 8). Double slabs are excluded: they emit 15 on every face and are
+ * handled by the normal integer logic.
+ *
+ * <p>The side signal itself (7 -> 8) is implemented in {@link DiodeBlockMixin}, because
+ * {@code getAlternateSignal} is declared on {@code DiodeBlock}.
+ */
 @Mixin(ComparatorBlock.class)
 public abstract class ComparatorBlockMixin
 {
-	@SuppressWarnings("override")
-	protected int getAlternateSignal(SignalGetter level, BlockPos pos, BlockState state)
-	{
-		Direction facing = state.getValue(HorizontalDirectionalBlock.FACING);
-		Direction clockwise = facing.getClockWise();
-		Direction counterClockwise = facing.getCounterClockWise();
-		int signal = Math.max(
-				level.getControlInputSignal(pos.relative(clockwise), clockwise, false),
-				level.getControlInputSignal(pos.relative(counterClockwise), counterClockwise, false)
-		);
-		signal = Math.max(signal, redstoneslab$slabSideSignal(level, pos.relative(clockwise), clockwise));
-		signal = Math.max(signal, redstoneslab$slabSideSignal(level, pos.relative(counterClockwise), counterClockwise));
-		return signal;
-	}
-
-	private static int redstoneslab$slabSideSignal(SignalGetter level, BlockPos neighborPos, Direction readerToNeighbor)
-	{
-		if (level.getBlockState(neighborPos).getBlock() instanceof RedstoneSlabBlock)
-		{
-			if (level.getSignal(neighborPos, readerToNeighbor) > 0)
-			{
-				return 8;
-			}
-		}
-		return 0;
-	}
-
 	@Inject(method = "calculateOutputSignal", at = @At("RETURN"), cancellable = true)
 	private void redstoneslab$calculateOutputSignal(Level level, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir)
 	{
-		if (redstoneslab$bothSlabs(level, pos, state) && state.getValue(ComparatorBlock.MODE) == ComparatorMode.COMPARE)
+		if (redstoneslab$bothSingleSlabs(level, pos, state) && state.getValue(ComparatorBlock.MODE) == ComparatorMode.COMPARE)
 		{
 			cir.setReturnValue(7);
 		}
@@ -77,26 +58,22 @@ public abstract class ComparatorBlockMixin
 	@Inject(method = "shouldTurnOn", at = @At("RETURN"), cancellable = true)
 	private void redstoneslab$shouldTurnOn(Level level, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir)
 	{
-		if (!cir.getReturnValue() && redstoneslab$bothSlabs(level, pos, state) && state.getValue(ComparatorBlock.MODE) == ComparatorMode.COMPARE)
+		if (!cir.getReturnValueZ() && redstoneslab$bothSingleSlabs(level, pos, state) && state.getValue(ComparatorBlock.MODE) == ComparatorMode.COMPARE)
 		{
 			cir.setReturnValue(true);
 		}
 	}
 
-	private static boolean redstoneslab$bothSlabs(Level level, BlockPos pos, BlockState state)
+	private static boolean redstoneslab$bothSingleSlabs(Level level, BlockPos pos, BlockState state)
 	{
 		Direction facing = state.getValue(HorizontalDirectionalBlock.FACING);
-		boolean front = level.getBlockState(pos.relative(facing)).getBlock() instanceof RedstoneSlabBlock;
-		boolean side = level.getBlockState(pos.relative(facing.getClockWise())).getBlock() instanceof RedstoneSlabBlock
-				|| level.getBlockState(pos.relative(facing.getCounterClockWise())).getBlock() instanceof RedstoneSlabBlock;
-		return front && side;
+		return redstoneslab$isSingleSlab(level.getBlockState(pos.relative(facing)))
+				&& (redstoneslab$isSingleSlab(level.getBlockState(pos.relative(facing.getClockWise())))
+				|| redstoneslab$isSingleSlab(level.getBlockState(pos.relative(facing.getCounterClockWise()))));
+	}
+
+	private static boolean redstoneslab$isSingleSlab(BlockState state)
+	{
+		return state.getBlock() instanceof RedstoneSlabBlock && state.getValue(RedstoneSlabBlock.TYPE) != SlabType.DOUBLE;
 	}
 }
-//#else
-//$$ import org.spongepowered.asm.mixin.Mixin;
-//$$
-//$$ @Mixin(net.minecraft.world.level.block.Block.class)
-//$$ public abstract class ComparatorBlockMixin
-//$$ {
-//$$ }
-//#endif

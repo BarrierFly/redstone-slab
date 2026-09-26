@@ -29,6 +29,12 @@
     "redstoneslab.mixins.json"
   ],
 
+  "custom": {
+    "lithium:options": {
+      "mixin.block.redstone_wire": false
+    }
+  },
+
   "depends": {
     "fabricloader": ">=0.14.0",
     "minecraft": "${minecraft_dependency}",

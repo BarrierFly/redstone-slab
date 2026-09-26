@@ -54,6 +54,17 @@ Supported versions / 支持版本:
 > 冰/雪翻倍通过为满足条件的位置追加一次 1/48 的降水判定实现，等效概率约 1/24。该实现会额外消耗世界
 > 随机数；同种子下部分原版随机行为（随机刻等）可能与无本模组的原版不同。这是设计文档中已接受的风险。
 
+## Compatibility / 兼容性
+
+- **Lithium**: Lithium replaces the vanilla redstone wire power calculation, which bypasses this
+  mod's weak-charging guard and would let a slab-charged conductor power redstone wire. This mod
+  declares `custom.lithium:options = { "mixin.block.redstone_wire": false }` in its `fabric.mod.json`,
+  so Lithium disables only that one redstone-wire optimisation while this mod is installed. All other
+  Lithium optimisations are unaffected.
+- **Carpet / Carpet-TIS (not covered)**: `fastRedstoneDust` / `RedstoneWireTurbo` perform their own
+  wire calculation and cannot be disabled the same way. A slab-charged conductor may power redstone
+  wire under those rules; disable the corresponding option if it matters.
+
 ## Differences from the existing "Redstone Slab" / 与既有 "Redstone Slab" 的区别
 
 There is an unrelated closed-source NeoForge mod named

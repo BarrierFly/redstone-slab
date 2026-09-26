@@ -7,10 +7,11 @@
     "FallingBlockEntityAccessor",
     "BlockInvoker",
     "PistonMovingBlockEntityMixin",
+    "DiodeBlockMixin",
+    "ComparatorBlockMixin",
+    "ServerLevelTickMixin",
     "modern.ModernScheduleTickMixin",
     "legacy.LegacyScheduleTickMixin",
-    "modern.ServerLevelTickMixin",
-    "modern.ComparatorBlockMixin",
     "modern.RedstoneWireBlockMixin",
     "legacy.LegacyRedstoneWireBlockMixin"
   ],
