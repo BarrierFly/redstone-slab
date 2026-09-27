@@ -2,7 +2,7 @@
  * This file is part of the Redstone Slab project, licensed under the
  * GNU Lesser General Public License v3.0
  *
- * Copyright (C) 2026  GTC and contributors
+ * Copyright (C) 2026  BarrierFly and contributors
  *
  * Redstone Slab is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by

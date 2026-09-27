@@ -6,11 +6,12 @@
   "name": "${name}",
   "description": "A directional redstone slab with half-delay, gravity and comparator 7.5 semantics.",
   "authors": [
-    "GTC"
+    "BarrierFly"
   ],
   "contact": {
-    "homepage": "https://modrinth.com",
-    "sources": "https://github.com/GTC/redstone-slab"
+    "homepage": "https://github.com/BarrierFly/redstone-slab",
+    "sources": "https://github.com/BarrierFly/redstone-slab",
+    "issues": "https://github.com/BarrierFly/redstone-slab/issues"
   },
   "license": "LGPL-3.0",
 
